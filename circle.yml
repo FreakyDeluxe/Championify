@@ -1,0 +1,22 @@
+machine:
+  environment:
+    LANG: en_US.UTF-8
+  node:
+    # must match package.json
+    version: 2.3.1
+
+dependencies:
+  pre:
+    - sw_vers -productVersion
+    - brew update
+    - brew install p7zip
+    # must match package.json
+    - npm install -g npm@2.8.2
+    - npm install || echo First NPM install failed # Fix electron-prebuilt failing on first install
+test:
+  override:
+    - npm test
+  post:
+    - 'export COVERALLS_SERVICE_JOB_ID=$CIRCLE_SHA1 && cat ./coverage/lcov.info | ./node_modules/.bin/coveralls'
+    - npm run build-artifact
+    - cp -rf ./release/ $CIRCLE_ARTIFACTS/release/

@@ -29,12 +29,14 @@ gulp.task 'build-artifact', (cb) ->
     return runSequence('build-artifact:osx', cb)
 
 gulp.task 'upload-artifcat', (cb) ->
-  commit = process.env.APPVEYOR_REPO_COMMIT or process.env.TRAVIS_COMMIT or 'NO_COMMIT'
+  commit = process.env.APPVEYOR_REPO_COMMIT or process.env.CIRCLE_SHA1 or 'NO_COMMIT'
   file = glob.sync('./releases/*.zip')[0]
   file_name = "Championify-#{process.platform}-#{commit}.zip"
 
   upload_file = path.join('./releases', file_name)
   fs.move file, upload_file, ->
+    return cb if process.platform == 'darwin'
+    
     options = {
       method: 'POST'
       url: 'http://www92.zippyshare.com/upload'
