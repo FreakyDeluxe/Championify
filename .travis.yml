@@ -1,6 +1,9 @@
 language: objective-c # Give me OSX images!
-install:
+before_install:
   - sw_vers -productVersion
+  - brew update
+  - brew install p7zip
+install:
   - rm -rf ~/.nvm
   - git clone https://github.com/creationix/nvm.git ~/.nvm
   - source ~/.nvm/nvm.sh
@@ -18,3 +21,9 @@ cache:
     - node_modules
 after_success:
   - 'cat ./coverage/lcov.info | ./node_modules/.bin/coveralls'
+  - npm run build-artifact
+addons:
+  artifacts:
+    s3_region: us-east-1
+    paths:
+      - ./download.txt
